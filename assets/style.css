@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+body {
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 16px;
+    color: #1A0933;
+    background-color: #1A0933;
+    margin: 5px 5px 5px 5px;
+    padding: 5px;
+}
+
+.container {
+    max-width: 2000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+    background: linear-gradient(135deg, #260d4b 0%, #2f0b66 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header-title {
+    margin: 0;
+    font-size: 2em;
+}
+
+.header-description {
+    margin: 10px 0 0;
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 5px 5px 5px 5px;
+}
+
+
+.four.columns {
+    flex: 0 0 calc(33.333% - 20px);
+    margin: 0 10px;
+    margin: 5px 5px 5px 5px;
+    padding: 25px;
+}
+
+.six.columns {
+    flex: 0 0 calc(50% - 20px);
+    margin: 0 10px;
+    margin: 5px 5px 5px 5px;
+    padding: 25px;
+}
+
+.chart-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    margin: 5px 5px 5px 5px;
+    padding: 25px;
+}
+
+.map-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 440px;
+    margin-bottom: 20px;
+    margin: 5px 5px 5px 5px;
+
+}
+
+.filters-row {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ml-container {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    margin-top: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
