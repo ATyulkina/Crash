@@ -92,7 +92,7 @@ def register_callbacks(app):
                 road_fig, weekday_fig, risk_fig, regions_fig, total_accidents, total_fatalities, total_injured)
 
     def create_map(df_filtered):
-        
+
         try:
             region_stats = df_filtered.groupby('Регион').agg({
                 'Широта': 'mean',
@@ -101,9 +101,11 @@ def register_callbacks(app):
                 'Число раненых': 'sum',
                 'Число участников': 'sum'
             }).reset_index()
-        
+            
             fig = px.scatter_mapbox(
                 region_stats,
+                lat='Широта',
+                lon='Долгота',
                 size='Число участников',
                 color='Число погибших',
                 hover_name='Регион',
@@ -115,18 +117,20 @@ def register_callbacks(app):
                 color_continuous_scale='reds',
                 size_max=30,
                 zoom=3,
-                center={'lat': 55.7558, 'lon': 37.6173},   
+                center={'lat': 55.7558, 'lon': 37.6173},  
             )
             
             fig.update_layout(
                 mapbox_style="carto-positron",
                 margin={"r": 0, "t": 30, "l": 0, "b": 0},
-                height=400
+                height=400, 
+                coloraxis_showscale=False
             )
+            
             return fig
         except:
             return go.Figure()
-
+    
     def create_top_regions_chart(df_filtered):
         top_regions = df_filtered['Регион'].value_counts().head(5).reset_index(name='Количество ДТП')
 
