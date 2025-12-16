@@ -91,8 +91,46 @@ def register_callbacks(app):
         return (map_fig, monthly_fig, hourly_fig, lighting_fig, weather_fig, 
                 road_fig, weekday_fig, risk_fig, regions_fig, total_accidents, total_fatalities, total_injured)
 
-    def create_map(df_filtered):
+    # def create_map(df_filtered):
 
+    #     try:
+    #         region_stats = df_filtered.groupby('Регион').agg({
+    #             'Широта': 'mean',
+    #             'Долгота': 'mean',
+    #             'Число погибших': 'sum',
+    #             'Число раненых': 'sum',
+    #             'Число участников': 'sum'
+    #         }).reset_index()
+            
+    #         fig = px.scatter_mapbox(
+    #             region_stats,
+    #             lat='Широта',
+    #             lon='Долгота',
+    #             size='Число участников',
+    #             color='Число погибших',
+    #             hover_name='Регион',
+    #             hover_data={
+    #                 'Число погибших': True,
+    #                 'Число раненых': True,
+    #                 'Число участников': True
+    #             },
+    #             color_continuous_scale='reds',
+    #             size_max=30,
+    #             zoom=3,
+    #             center={'lat': 55.7558, 'lon': 37.6173}
+    #         )
+            
+    #         fig.update_layout(
+    #             mapbox_style="carto-positron",
+    #             margin={"r": 0, "t": 30, "l": 0, "b": 0},
+    #             height=400
+    #         )
+            
+    #         return fig
+    #     except:
+    #         return go.Figure()
+    
+    def create_map(df_filtered):
         try:
             region_stats = df_filtered.groupby('Регион').agg({
                 'Широта': 'mean',
@@ -102,34 +140,54 @@ def register_callbacks(app):
                 'Число участников': 'sum'
             }).reset_index()
             
-            fig = px.scatter_mapbox(
-                region_stats,
-                lat='Широта',
-                lon='Долгота',
-                size='Число участников',
-                color='Число погибших',
-                hover_name='Регион',
-                hover_data={
-                    'Число погибших': True,
-                    'Число раненых': True,
-                    'Число участников': True
-                },
-                color_continuous_scale='reds',
-                size_max=30,
-                zoom=3,
-                center={'lat': 55.7558, 'lon': 37.6173}
+            fig = go.Figure()
+            
+            fig.add_trace(go.Scattergeo(
+                lon=region_stats['Долгота'],
+                lat=region_stats['Широта'],
+                text=region_stats['Регион'],
+                marker=dict(
+                    size=region_stats['Число участников'] / 10,  # масштабируем размер
+                    color=region_stats['Число погибших'],
+                    colorscale='Reds',
+                    showscale=True,
+                    colorbar_title="Число погибших"
+                ),
+                mode='markers',
+                hoverinfo='text',
+                hovertext=region_stats.apply(
+                    lambda x: f"Регион: {x['Регион']}<br>Погибших: {x['Число погибших']}<br>Раненых: {x['Число раненых']}<br>Участников: {x['Число участников']}",
+                    axis=1
+                )
+            ))
+            
+            fig.update_geos(
+                projection_type="natural earth",
+                showcountries=True,
+                showcoastlines=True,
+                coastlinecolor="Black",
+                showland=True,
+                landcolor="lightgray",
+                countrycolor="white"
             )
             
             fig.update_layout(
-                mapbox_style="carto-positron",
-                margin={"r": 0, "t": 30, "l": 0, "b": 0},
-                height=400
+                height=400,
+                title_text="Карта ДТП по регионам",
+                geo=dict(
+                    scope='world',
+                    center=dict(lat=55, lon=37),
+                    projection_scale=3
+                )
             )
             
             return fig
-        except:
+        except Exception as e:
+            print(f"Ошибка: {e}")
             return go.Figure()
-    
+
+
+
     def create_top_regions_chart(df_filtered):
         top_regions = df_filtered['Регион'].value_counts().head(5).reset_index(name='Количество ДТП')
 
