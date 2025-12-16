@@ -132,6 +132,16 @@ def register_callbacks(app):
     
     def create_map(df_filtered):
         try:
+            # Добавьте логирование
+            print(f"Данные для карты: {len(df_filtered)} строк")
+            print(f"Колонки: {df_filtered.columns.tolist()}")
+            print(f"Регионы: {df_filtered['Регион'].unique()[:10]}")
+            
+            # Проверка на пустые данные
+            if df_filtered.empty:
+                print("df_filtered пустой!")
+                return go.Figure()
+                
             region_stats = df_filtered.groupby('Регион').agg({
                 'Широта': 'mean',
                 'Долгота': 'mean',
@@ -140,50 +150,42 @@ def register_callbacks(app):
                 'Число участников': 'sum'
             }).reset_index()
             
-            fig = go.Figure()
+            print(f"Статистика по регионам: {len(region_stats)} регионов")
+            print(f"Координаты: {region_stats[['Широта', 'Долгота']].head()}")
             
-            fig.add_trace(go.Scattergeo(
-                lon=region_stats['Долгота'],
-                lat=region_stats['Широта'],
-                text=region_stats['Регион'],
-                marker=dict(
-                    size=region_stats['Число участников'] / 10,  # масштабируем размер
-                    color=region_stats['Число погибших'],
-                    colorscale='Reds',
-                    showscale=True,
-                    colorbar_title="Число погибших"
-                ),
-                mode='markers',
-                hoverinfo='text',
-                hovertext=region_stats.apply(
-                    lambda x: f"Регион: {x['Регион']}<br>Погибших: {x['Число погибших']}<br>Раненых: {x['Число раненых']}<br>Участников: {x['Число участников']}",
-                    axis=1
-                )
-            ))
-            
-            fig.update_geos(
-                projection_type="natural earth",
-                showcountries=True,
-                showcoastlines=True,
-                coastlinecolor="Black",
-                showland=True,
-                landcolor="lightgray",
-                countrycolor="white"
+            # Проверка на NaN в координатах
+            if region_stats['Широта'].isnull().any() or region_stats['Долгота'].isnull().any():
+                print("Есть NaN в координатах!")
+                
+            fig = px.scatter_mapbox(
+                region_stats,
+                lat='Широта',
+                lon='Долгота',
+                size='Число участников',
+                color='Число погибших',
+                hover_name='Регион',
+                hover_data={
+                    'Число погибших': True,
+                    'Число раненых': True,
+                    'Число участников': True
+                },
+                color_continuous_scale='reds',
+                size_max=30,
+                zoom=3,
+                center={'lat': 55.7558, 'lon': 37.6173}
             )
             
             fig.update_layout(
-                height=400,
-                title_text="Карта ДТП по регионам",
-                geo=dict(
-                    scope='world',
-                    center=dict(lat=55, lon=37),
-                    projection_scale=3
-                )
+                mapbox_style="carto-positron",
+                margin={"r": 0, "t": 30, "l": 0, "b": 0},
+                height=400
             )
             
             return fig
         except Exception as e:
-            print(f"Ошибка: {e}")
+            print(f"Ошибка в create_map: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return go.Figure()
 
 
