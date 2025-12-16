@@ -117,14 +117,13 @@ def register_callbacks(app):
                 color_continuous_scale='reds',
                 size_max=30,
                 zoom=3,
-                center={'lat': 55.7558, 'lon': 37.6173},  
+                center={'lat': 55.7558, 'lon': 37.6173}
             )
             
             fig.update_layout(
                 mapbox_style="carto-positron",
                 margin={"r": 0, "t": 30, "l": 0, "b": 0},
-                height=400, 
-                coloraxis_showscale=False
+                height=400
             )
             
             return fig
