@@ -91,9 +91,57 @@ def register_callbacks(app):
         return (map_fig, monthly_fig, hourly_fig, lighting_fig, weather_fig, 
                 road_fig, weekday_fig, risk_fig, regions_fig, total_accidents, total_fatalities, total_injured)
 
-    # def create_map(df_filtered):
+    def create_map(df_filtered):
 
+        try:
+            region_stats = df_filtered.groupby('Регион').agg({
+                'Широта': 'mean',
+                'Долгота': 'mean',
+                'Число погибших': 'sum',
+                'Число раненых': 'sum',
+                'Число участников': 'sum'
+            }).reset_index()
+            
+            fig = px.scatter_mapbox(
+                region_stats,
+                lat='Широта',
+                lon='Долгота',
+                size='Число участников',
+                color='Число погибших',
+                hover_name='Регион',
+                hover_data={
+                    'Число погибших': True,
+                    'Число раненых': True,
+                    'Число участников': True
+                },
+                color_continuous_scale='reds',
+                size_max=30,
+                zoom=3,
+                center={'lat': 55.7558, 'lon': 37.6173}
+            )
+            
+            fig.update_layout(
+                mapbox_style="open-street-map",
+                margin={"r": 0, "t": 30, "l": 0, "b": 0},
+                height=400
+            )
+            
+            return fig
+        except:
+            return go.Figure()
+    
+    # def create_map(df_filtered):
     #     try:
+    #         # Добавьте логирование
+    #         print(f"Данные для карты: {len(df_filtered)} строк")
+    #         print(f"Колонки: {df_filtered.columns.tolist()}")
+    #         print(f"Регионы: {df_filtered['Регион'].unique()[:10]}")
+            
+    #         # Проверка на пустые данные
+    #         if df_filtered.empty:
+    #             print("df_filtered пустой!")
+    #             return go.Figure()
+                
     #         region_stats = df_filtered.groupby('Регион').agg({
     #             'Широта': 'mean',
     #             'Долгота': 'mean',
@@ -102,6 +150,13 @@ def register_callbacks(app):
     #             'Число участников': 'sum'
     #         }).reset_index()
             
+    #         print(f"Статистика по регионам: {len(region_stats)} регионов")
+    #         print(f"Координаты: {region_stats[['Широта', 'Долгота']].head()}")
+            
+    #         # Проверка на NaN в координатах
+    #         if region_stats['Широта'].isnull().any() or region_stats['Долгота'].isnull().any():
+    #             print("Есть NaN в координатах!")
+                
     #         fig = px.scatter_mapbox(
     #             region_stats,
     #             lat='Широта',
@@ -127,66 +182,11 @@ def register_callbacks(app):
     #         )
             
     #         return fig
-    #     except:
+    #     except Exception as e:
+    #         print(f"Ошибка в create_map: {str(e)}")
+    #         import traceback
+    #         traceback.print_exc()
     #         return go.Figure()
-    
-    def create_map(df_filtered):
-        try:
-            # Добавьте логирование
-            print(f"Данные для карты: {len(df_filtered)} строк")
-            print(f"Колонки: {df_filtered.columns.tolist()}")
-            print(f"Регионы: {df_filtered['Регион'].unique()[:10]}")
-            
-            # Проверка на пустые данные
-            if df_filtered.empty:
-                print("df_filtered пустой!")
-                return go.Figure()
-                
-            region_stats = df_filtered.groupby('Регион').agg({
-                'Широта': 'mean',
-                'Долгота': 'mean',
-                'Число погибших': 'sum',
-                'Число раненых': 'sum',
-                'Число участников': 'sum'
-            }).reset_index()
-            
-            print(f"Статистика по регионам: {len(region_stats)} регионов")
-            print(f"Координаты: {region_stats[['Широта', 'Долгота']].head()}")
-            
-            # Проверка на NaN в координатах
-            if region_stats['Широта'].isnull().any() or region_stats['Долгота'].isnull().any():
-                print("Есть NaN в координатах!")
-                
-            fig = px.scatter_mapbox(
-                region_stats,
-                lat='Широта',
-                lon='Долгота',
-                size='Число участников',
-                color='Число погибших',
-                hover_name='Регион',
-                hover_data={
-                    'Число погибших': True,
-                    'Число раненых': True,
-                    'Число участников': True
-                },
-                color_continuous_scale='reds',
-                size_max=30,
-                zoom=3,
-                center={'lat': 55.7558, 'lon': 37.6173}
-            )
-            
-            fig.update_layout(
-                mapbox_style="carto-positron",
-                margin={"r": 0, "t": 30, "l": 0, "b": 0},
-                height=400
-            )
-            
-            return fig
-        except Exception as e:
-            print(f"Ошибка в create_map: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            return go.Figure()
 
 
 
